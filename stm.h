@@ -1,7 +1,6 @@
 #include "dlib/svm.h"
 #include <iostream>
 #include <stdlib.h> 
-// #include <unordered_map>
 
 
 typedef dlib::matrix<double, 2, 1> sample_type;
@@ -14,9 +13,10 @@ public:
     funct_type learned_function;
     dlib::svm_c_trainer<kernel_type> trainer;
     dlib::vector_normalizer<sample_type> normalizer;
-    // std::unordered_multimap<int, std::vector<sample_type> > basis_timer;
+    std::vector<sample_type> to_delete;
 
-    stm (std::vector<sample_type> s, std::vector<double> l);
+
+    stm (std::vector<sample_type> samples, std::vector<double> labels);
 
     /*!
     если константы C и gamma равны начальным значениям 1 и 0.01, 
@@ -31,10 +31,20 @@ public:
     void denormalize (std::vector<matrix_type>& vecs);
 
     // добавляет новую выборку к существующим опорным векторам
-    void update (std::vector<sample_type> s, std::vector<double> l);
+    void update (std::vector<sample_type>& samples, std::vector<double>& labels);
+
+    void commit_delete ();
 
     template <typename matrix_type>
-    std::vector<sample_type> to_vector(const matrix_type& M);
+    void to_vector(const matrix_type& M, std::vector<sample_type>& vec);
 
-    void reduce_basis (std::vector<sample_type>& samples, std::vector<double>& labels);
+    void sgn (std::vector<double>& labels);
+
+    void reduce_basis (std::vector<sample_type>& samples, std::vector<double>& labels, double eps);
+
+    std::vector<sample_type> get_basis_vectors();
+
+    void delete_basis(std::vector<sample_type>& basis, bool upd);
+
+    bool vec_eq(sample_type& a, sample_type& b);
 };
